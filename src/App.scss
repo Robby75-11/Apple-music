@@ -1,0 +1,29 @@
+$max-width: 1980px; // Definisce una variabile per la larghezza massima del body.
+$padding: 2rem; // Definisce una variabile per il padding generale.
+$bg-color: black; // Definisce una variabile per il colore di sfondo del body.
+$text-align: center; // Definisce una variabile per l'allineamento del testo.
+
+body {
+  max-width: $max-width; // Imposta la larghezza massima del body utilizzando la variabile.
+  margin: 0 auto; // Centra orizzontalmente il body nella finestra.
+  padding: $padding; // Applica il padding definito dalla variabile a tutti i lati del body.
+  text-align: $text-align; // Allinea il testo all'interno del body al centro utilizzando la variabile.
+  background-color: $bg-color; // Imposta il colore di sfondo del body utilizzando la variabile.
+
+  // Nested styles per elementi all'interno del body
+  .btn {
+    border-radius: 10px; // Applica un bordo arrotondato di 10px a tutti gli elementi con classe .btn.
+
+    // Stili specifici per il pulsante con classe aggiuntiva .btn-custom-red
+    .btn-custom-red {
+      background-color: #e50914 !important; // Imposta il colore di sfondo a un rosso specifico (#e50914) e usa !important per sovrascrivere altre regole con minore specificità.
+      color: white; // Imposta il colore del testo a bianco.
+      border: none; // Rimuove il bordo predefinito del pulsante.
+
+      // Stili per lo stato di hover (quando il mouse passa sopra l'elemento)
+      &:hover {
+        background-color: #e50914 !important; // Mantiene lo stesso colore rosso al passaggio del mouse, impedendo qualsiasi cambiamento di colore predefinito.
+      }
+    }
+  }
+}

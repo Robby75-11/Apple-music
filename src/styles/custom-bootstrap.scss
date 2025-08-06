@@ -1,0 +1,15 @@
+// src/styles/custom-bootstrap.scss
+
+// Definisce una variabile per il colore primario di Bootstrap e lo imposta su #ff5c5c (un tono di rosso/arancio).
+$primary: #ff5c5c;
+
+// Definisce una variabile per il colore di sfondo del body e lo imposta su #121212 (un grigio scuro/nero).
+$body-bg: #121212;
+
+// Definisce una variabile per il colore del testo del body e lo imposta su #fff (bianco).
+$body-color: #fff;
+
+// Importa il foglio di stile principale di Bootstrap da node_modules (o dal percorso specificato).
+// Questa linea include tutti gli stili predefiniti di Bootstrap, ma con le variabili personalizzate
+// definite sopra che sovrascrivono i valori predefiniti di Bootstrap per $primary, $body-bg e $body-color.
+@import "bootstrap/scss/bootstrap";
