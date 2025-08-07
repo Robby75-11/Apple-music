@@ -1,16 +1,20 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { setUser } from "../redux/userSlice";
+import { useSelector } from "react-redux";
 
 const Login = () => {
   const [form, setForm] = useState({ email: "", password: "" });
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const user = useSelector((state) => state.user.user);
+
   useEffect(() => {
-    // Se c'è già il token, reindirizza subito
-    const token = localStorage.getItem("token");
-    if (token) {
-      navigate("/"); // evita di mostrare il form
+    if (user) {
+      navigate("/");
     }
-  }, [navigate]);
+  }, [user, navigate]);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -28,8 +32,21 @@ const Login = () => {
       if (res.ok) {
         const data = await res.json();
         localStorage.setItem("token", data.token);
-        sessionStorage.setItem("justLogged", "true");
-        navigate("/");
+
+        // Recupera i dati utente autenticato
+        const meRes = await fetch("http://localhost:8080/auth/me", {
+          headers: { Authorization: `Bearer ${data.token}` },
+        });
+
+        if (meRes.ok) {
+          const userData = await meRes.json();
+          dispatch(setUser(userData));
+          alert("✅ Login avvenuto con successo");
+          navigate("/");
+        } else {
+          alert("⚠️ Login effettuato, ma impossibile recuperare l'utente.");
+          navigate("/");
+        }
       } else {
         alert("❌ Credenziali errate");
       }

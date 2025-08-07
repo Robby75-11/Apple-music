@@ -45,12 +45,8 @@ const App = () => {
           <Route path="/quiz/:id" element={<QuizPage />} />
         </Routes>
         <Section title="Nuove uscite" query="new" selectTrack={selectTrack} />
-        <Section
-          title="Queen"
-          query="queen"
-          onPlay
-          selectTrack={setCurrentTrack}
-        />
+        <Section title="Queen" query="queen" onPlay selectTrack={selectTrack} />
+        <Section title="883" query="883" onPlay selectTrack={selectTrack} />
         <Footer />
         <Player />
       </div>

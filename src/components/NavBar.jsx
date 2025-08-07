@@ -3,10 +3,13 @@ import { useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 import apple from "../assets/apple.svg";
 import music from "../assets/music.svg";
+import { useSelector, useDispatch } from "react-redux";
+import { logout } from "../redux/userSlice";
 
 const NavBar = () => {
   const navigate = useNavigate();
-  const [user, setUser] = useState(null);
+  const dispatch = useDispatch();
+  const user = useSelector((state) => state.user.user);
   const [query, setQuery] = useState("");
   const [volume, setVolume] = useState(50);
 
@@ -17,24 +20,11 @@ const NavBar = () => {
     }
   };
 
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (token && token.split(".").length === 3) {
-      try {
-        const decoded = jwtDecode(token);
-        setUser({
-          username:
-            decoded.sub || decoded.username || decoded.email || "Utente",
-          avatarUrl:
-            decoded.avatarUrl ||
-            `https://ui-avatars.com/api/?name=${decoded.sub || "U"}`,
-        });
-      } catch (err) {
-        console.error("Token non valido", err);
-        localStorage.removeItem("token");
-      }
-    }
-  }, []);
+  const handleLogout = () => {
+    dispatch(logout()); // ← azzera lo user nel Redux
+    localStorage.removeItem("token"); // ← rimuove il token
+    navigate("/login"); // ← torna alla pagina di login
+  };
 
   return (
     <nav className="navbar bg-dark py-1 position-relative ">
@@ -146,8 +136,8 @@ const NavBar = () => {
             <button
               className="btn btn-outline-light btn-sm"
               onClick={() => {
-                localStorage.removeItem("token");
-                window.location.reload();
+                dispatch(logout());
+                navigate("/login");
               }}
             >
               Logout
