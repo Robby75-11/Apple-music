@@ -11,6 +11,9 @@ import LyricsPage from "./components/LyricsPage";
 import { useSelector, useDispatch } from "react-redux";
 import { setCurrentTrack } from "./redux/playerSlice";
 import QuizPage from "./components/QuizPage";
+import Register from "./components/Register";
+import Login from "./components/Login";
+
 const songs = [
   {
     id: 1,
@@ -35,6 +38,8 @@ const App = () => {
         <NavBar />
         <Routes>
           <Route path="/" element={<HomePage />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/login" element={<Login />} />
           <Route path="/search" element={<Search onPlay={selectTrack} />} />
           <Route path="/lyrics/:id" element={<LyricsPage />} />
           <Route path="/quiz/:id" element={<QuizPage />} />

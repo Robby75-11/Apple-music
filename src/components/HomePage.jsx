@@ -8,6 +8,12 @@ const HomePage = () => {
   const [playlist, setPlaylist] = useState([]);
 
   useEffect(() => {
+    const justLogged = sessionStorage.getItem("justLogged");
+    if (justLogged) {
+      alert("✅ Login avvenuto con successo");
+      sessionStorage.removeItem("justLogged");
+    }
+
     const fetchPlaylist = async () => {
       try {
         const queenTracks = await fetchDeezer("Queen");
@@ -32,7 +38,6 @@ const HomePage = () => {
 
     fetchPlaylist();
   }, []);
-
   return (
     <div className="container mt-4 text-white">
       <h2 className="mb-4">🎧 Benvenuto nella Home musicale!</h2>
