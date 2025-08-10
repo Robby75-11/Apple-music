@@ -2,54 +2,30 @@ import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 
 const LyricsPage = () => {
-  const { id } = useParams(); // questo è il songId
+  const { id } = useParams(); // songId
   const [lyrics, setLyrics] = useState("");
   const [song, setSong] = useState(null);
-  const token = localStorage.getItem("token");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   const fetchLyrics = async () => {
+    setLoading(true);
+    setError(null);
+
     try {
-      const res = await fetch(`http://localhost:8080/api/lyrics/song/${id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const res = await fetch(`http://localhost:8080/api/lyrics/song/${id}`);
       if (res.ok) {
         const data = await res.json();
         setLyrics(data.lyrics);
-      } else if (res.status === 404) {
-        console.log("Lyrics non trovate, provo a fetchare da lyrics.ovh");
-
-        // 1. Recupero info della song per inviare il fetch corretto
-        const songRes = await fetch(`http://localhost:8080/api/songs/${id}`);
-        const songData = await songRes.json();
-        setSong(songData);
-
-        // 2. Prova a fetchare da API esterna
-        const fetchRes = await fetch(`http://localhost:8080/api/lyrics/fetch`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`, // oppure rimuovi se pubblico
-          },
-          body: JSON.stringify({
-            deezerId: songData.id, // o songData.deezerId se presente
-            titolo: songData.titolo,
-            artista: songData.artista,
-          }),
-        });
-
-        if (fetchRes.ok) {
-          const lyricsText = await fetchRes.text();
-          setLyrics(lyricsText);
-        } else {
-          console.error("Lyrics esterne non trovate");
-        }
+        setSong(data.song);
       } else {
-        console.error("Errore fetch lyrics:", res.status);
+        setError("❌ Errore nella richiesta al server");
       }
     } catch (err) {
       console.error("Errore durante il fetch delle lyrics", err);
+      setError("Errore di rete");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -59,8 +35,21 @@ const LyricsPage = () => {
 
   return (
     <div className="container text-white mt-5">
-      <h2>Testo del brano</h2>
-      <pre>{lyrics || "🎵 Testo non disponibile"}</pre>
+      {loading ? (
+        <p>⏳ Caricamento testo...</p>
+      ) : error ? (
+        <p>{error}</p>
+      ) : (
+        <>
+          {song && (
+            <div className="mb-4">
+              <h2 className="fw-bold">{song.titolo}</h2>
+              <h5 className="text-muted">di {song.artista.nome}</h5>
+            </div>
+          )}
+          <pre>{lyrics || "🎵 Testo non disponibile"}</pre>
+        </>
+      )}
     </div>
   );
 };

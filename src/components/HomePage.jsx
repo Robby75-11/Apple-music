@@ -18,7 +18,7 @@ const HomePage = () => {
           ...vendittiTracks.slice(0, 3),
         ].map((song) => ({
           titolo: song.title,
-          artista: song.artist?.name || "Artista sconosciuto",
+          artista: { nome: song.artist?.name || "Artista sconosciuto" },
           coverImageUrl: song.album?.cover_medium,
           audioUrl: song.preview,
           id: song.id,

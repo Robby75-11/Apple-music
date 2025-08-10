@@ -1,8 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { setUser } from "../redux/userSlice";
-import { useSelector } from "react-redux";
 
 const Login = () => {
   const [form, setForm] = useState({ email: "", password: "" });
@@ -33,7 +32,6 @@ const Login = () => {
         const data = await res.json();
         localStorage.setItem("token", data.token);
 
-        // Recupera i dati utente autenticato
         const meRes = await fetch("http://localhost:8080/auth/me", {
           headers: { Authorization: `Bearer ${data.token}` },
         });
@@ -45,7 +43,6 @@ const Login = () => {
           navigate("/");
         } else {
           alert("⚠️ Login effettuato, ma impossibile recuperare l'utente.");
-          navigate("/");
         }
       } else {
         alert("❌ Credenziali errate");

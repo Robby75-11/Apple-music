@@ -15,7 +15,7 @@ const Section = ({ title, query }) => {
       const mapped = result.map((song) => ({
         id: song.id,
         titolo: song.title,
-        artista: song.artist?.name,
+        artista: { nome: song.artist?.name },
         coverImageUrl: song.album?.cover_medium,
         audioUrl: song.preview,
       }));

@@ -4,7 +4,7 @@ import NavBar from "./components/NavBar";
 import Section from "./components/Section";
 import Footer from "./components/Footer";
 import Player from "./components/Player";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Search from "./components/Search";
 import HomePage from "./components/HomePage";
 import LyricsPage from "./components/LyricsPage";
@@ -13,7 +13,7 @@ import { setCurrentTrack } from "./redux/playerSlice";
 import QuizPage from "./components/QuizPage";
 import Register from "./components/Register";
 import Login from "./components/Login";
-
+import QuizBraniPubblico from "./components/QuizBraniPubblico";
 const songs = [
   {
     id: 1,
@@ -43,10 +43,11 @@ const App = () => {
           <Route path="/search" element={<Search onPlay={selectTrack} />} />
           <Route path="/lyrics/:id" element={<LyricsPage />} />
           <Route path="/quiz/:id" element={<QuizPage />} />
+          <Route path="/quiz/brani" element={<QuizBraniPubblico />} />
         </Routes>
-        <Section title="Nuove uscite" query="new" selectTrack={selectTrack} />
-        <Section title="Queen" query="queen" onPlay selectTrack={selectTrack} />
-        <Section title="883" query="883" onPlay selectTrack={selectTrack} />
+        <Section title="Nuove uscite" query="new" />
+        <Section title="Queen" query="queen" />
+        <Section title="883" query="883" />
         <Footer />
         <Player />
       </div>

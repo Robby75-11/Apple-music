@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
+import { audioRef } from "./Player";
 
-const QuizGame = ({ quizData }) => {
+const QuizGame = ({ quizData, onComplete }) => {
   if (!quizData || !quizData.domande || quizData.domande.length === 0) {
     return (
       <p className="text-center mt-5">
@@ -15,40 +16,48 @@ const QuizGame = ({ quizData }) => {
   const [score, setScore] = useState(0);
   const [started, setStarted] = useState(false);
   const [showResult, setShowResult] = useState(false);
+  const [needPlayClick, setNeedPlayClick] = useState(false);
 
   const domanda = quizData.domande[currentQuestion];
   const totalQuestions = quizData.domande.length;
 
+  // 🔹 Utility
+  const isHttpUrl = (s) => !!s && /^https?:\/\//.test(s);
+  const isAudioQuestion = domanda?.testo
+    ?.toLowerCase()
+    .startsWith("quale brano stai ascoltando");
+
   // TIMER
   useEffect(() => {
     if (!started || selected !== null || showResult) return;
-
     if (timeLeft === 0) {
       handleNext();
       return;
     }
-
-    const interval = setInterval(() => {
-      setTimeLeft((prev) => prev - 1);
-    }, 1000);
-
+    const interval = setInterval(() => setTimeLeft((prev) => prev - 1), 1000);
     return () => clearInterval(interval);
-  }, [timeLeft, started, selected]);
+  }, [timeLeft, started, selected, showResult]);
+
+  // AUDIO AUTO-PLAY
+  useEffect(() => {
+    setNeedPlayClick(false);
+    if (!isAudioQuestion || !isHttpUrl(domanda?.snippet)) return;
+    audioRef.current?.pause();
+    audioRef.current = new Audio(domanda.snippet);
+    audioRef.current.play().catch(() => setNeedPlayClick(true));
+  }, [currentQuestion]);
 
   const handleSelect = (option) => {
+    if (selected) return;
     setSelected(option);
-    if (option === domanda.rispostaCorretta) {
-      setScore((prev) => prev + 1);
-    }
-
-    setTimeout(() => {
-      handleNext();
-    }, 1000);
+    if (option === domanda.rispostaCorretta) setScore((prev) => prev + 1);
+    setTimeout(() => handleNext(), 800);
   };
 
   const handleNext = () => {
     if (currentQuestion + 1 >= totalQuestions) {
       setShowResult(true);
+      if (onComplete) onComplete({ score: score, total: totalQuestions });
     } else {
       setCurrentQuestion((prev) => prev + 1);
       setTimeLeft(30);
@@ -56,8 +65,17 @@ const QuizGame = ({ quizData }) => {
     }
   };
 
+  const handleRetry = () => {
+    setCurrentQuestion(0);
+    setTimeLeft(30);
+    setSelected(null);
+    setScore(0);
+    setShowResult(false);
+    setStarted(false);
+  };
+
   const progressoPercentuale = Math.round(
-    (currentQuestion / totalQuestions) * 100
+    (currentQuestion / Math.max(1, totalQuestions - 1)) * 100
   );
 
   if (!started) {
@@ -89,6 +107,9 @@ const QuizGame = ({ quizData }) => {
           Hai totalizzato <strong>{score}</strong> su{" "}
           <strong>{totalQuestions}</strong> punti.
         </p>
+        <button className="btn btn-outline-light mt-3" onClick={handleRetry}>
+          Riprova
+        </button>
       </div>
     );
   }
@@ -137,7 +158,7 @@ const QuizGame = ({ quizData }) => {
             backgroundColor: "aquamarine",
             transition: "width 0.3s",
           }}
-        ></div>
+        />
       </div>
 
       {/* NUMERO DOMANDA */}
@@ -146,28 +167,51 @@ const QuizGame = ({ quizData }) => {
       </p>
 
       {/* TESTO DOMANDA */}
-      <h4 style={{ marginBottom: "20px" }}>{domanda.testo}</h4>
+      <h4 style={{ marginBottom: "20px", whiteSpace: "pre-line" }}>
+        {domanda.testo}
+      </h4>
+
+      {/* AUDIO PLAYER O PULSANTE */}
+      {isAudioQuestion && isHttpUrl(domanda.snippet) && (
+        <div style={{ marginBottom: "20px" }}>
+          {needPlayClick ? (
+            <button
+              className="btn btn-info"
+              onClick={() => {
+                audioRef.current?.play();
+                setNeedPlayClick(false);
+              }}
+            >
+              ▶️ Riproduci audio
+            </button>
+          ) : (
+            <audio
+              src={domanda.snippet}
+              controls
+              autoPlay
+              style={{ width: "100%" }}
+            />
+          )}
+        </div>
+      )}
 
       {/* OPZIONI */}
       <ul style={{ listStyle: "none", padding: 0 }}>
         {domanda.opzioni.map((option, i) => {
-          let bgColor = "#f4f4f4ff";
+          let bgColor = "#0d6efd";
           if (selected) {
-            if (option === domanda.rispostaCorretta) {
+            if (option === domanda.rispostaCorretta)
               bgColor = "#98FB98"; // verde
-            } else if (option === selected) {
-              bgColor = "#F08080"; // rosso
-            }
+            else if (option === selected) bgColor = "#F08080"; // rosso
           }
-
           return (
             <li
               key={i}
-              onClick={() => !selected && handleSelect(option)}
+              onClick={() => handleSelect(option)}
               style={{
                 cursor: selected ? "default" : "pointer",
                 backgroundColor: bgColor,
-                border: "1px solid #ccc",
+                color: "black",
                 borderRadius: "10px",
                 padding: "10px",
                 marginBottom: "10px",
